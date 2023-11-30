@@ -1,0 +1,85 @@
+package aed.individual4;
+
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import es.upm.aedlib.Position;
+import es.upm.aedlib.positionlist.PositionList;
+
+public class OrderedIterator implements Iterator<Integer> {
+
+  // Tienes permiso, y debes, definir atributos nuvevos
+  private PositionList<Integer> list;
+  private Position<Integer> cursor;
+  private Position<Integer> sigOrden;
+  private Integer expected;
+  private Integer given;
+  private boolean futuro;
+  private Position<Integer> lastShown;
+  
+  public OrderedIterator(PositionList<Integer> list) {
+	  this.list = list;
+	  cursor=list.first();
+	  expected = null; given = null; futuro = true;
+	  sigOrden = cursor; shownLast = false;
+  }
+
+  public boolean hasNext() {
+	  boolean tiene = false;
+	  boolean last = cursor == list.last();
+	  if (cursor!=null&&futuro&&!last) {
+		  expected=cursor.element();
+		  sigOrden = cursor;
+	  }
+	  
+	  if(expected!=null&&futuro&&!last) {
+		  if(given==null) {
+			  given = expected;
+		  }
+		  tiene = expected>=given;
+		  while(sigOrden!=null&&!tiene) {
+			  sigOrden = list.next(sigOrden);
+			  if(sigOrden!=null) {
+				  expected = sigOrden.element();
+				  tiene = expected>=given;
+			  }
+			  else {
+				  tiene = false;
+			  }
+
+		  }
+	  }
+	  return tiene;
+  }
+  
+  public Integer next() {
+	  if (cursor!=null&&futuro) {
+		  expected=cursor.element();
+	  }
+	  if(expected!=null&&futuro&&cursor!=null) {
+		  
+		  if(given==null) {
+			  given=expected;
+			  cursor=list.next(cursor);
+		  }
+		  else {
+			  futuro = hasNext();
+			  given = expected;
+			  if(sigOrden!=null) {
+				  cursor = list.next(sigOrden);
+			  }
+			  else {
+				  futuro = false;
+				  throw new NoSuchElementException();
+			  }
+		  }
+	  }
+	  else {
+		  futuro = false;
+		  throw new NoSuchElementException();
+	  }
+	  
+	  return given;
+  }
+  
+  // Implementa los metodos que hace falta
+}
